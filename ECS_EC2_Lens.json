@@ -1,0 +1,679 @@
+{
+  "schemaVersion": "2021-11-01",
+  "name": "ECS Best Practices",
+  "description": "ECS Well Architected ",
+  "pillars": [
+    {
+      "id": "PERF",
+      "name": "Performance Efficiency",
+      "questions": [
+        {
+          "id": "PERF_1",
+          "title": "ECS container images are optimized",
+          "description": "Description isn't a necessary property here for a question, but it might help your lens users.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "All task dependencies are included within the image",
+              "helpfulResource": {
+                "displayText": "•Including all dependencies as static ﬁles in the container image reduces the number of potentially\nbreaking events that can happen during deployments. As you scale out to tens, hundreds, or even\nthousands of copies of your container, downloading a single container image rather than downloading\nfrom two or three diﬀerent places simpliﬁes your workload by limiting potential breaking points.\nFor example, assume that you're deploying 100 copies of your application, and each copy of the\napplication has to download pieces from three diﬀerent sources. There are 300 downloads that can\nfail. If you're downloading a container image, there's only 100 dependencies that can break.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "No data downloads required as part of application/task startup.",
+              "helpfulResource": {
+                "displayText": "don't dynamically download libraries, dependencies, or critical data during application\nstartup. Instead, include these things as static ﬁles in the container image. Later on, if you want to\nchange something in the container image, build a new container image with the changes applied to it.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice3",
+              "title": "Container image uses shared layers.",
+              "helpfulResource": {
+                "displayText": "For example, if you have multiple\napplications that use the same data set, you can create a shared base image that has that data set. Then,\nbuild two diﬀerent image variants oﬀ of the same shared base image. This allows the container image\nlayer with the dataset to be downloaded one time, rather than twice.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice4",
+              "title": "Build tools and unnecessary components removed from container image",
+              "helpfulResource": {
+                "displayText": "Complete containers hold everything that's needed to run your application, but they don't need to\ninclude your build tools. Consider this example. Assume that you're building a container for a Node.js\napplication. You must have the NPM package manager to download packages for your application.\nHowever, you no longer need NPM itself when the application runs. You can use a multistage Docker\nbuild to solve this.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice5",
+              "title": "One application process per container image",
+              "helpfulResource": {
+                "displayText": "In a traditional virtual machine environment, it's typical to run a high-level daemon like systemd as the\nroot process. This daemon is then responsible for starting your application process, and restarting the\napplication process if it crashes. We don't recommend this when using containers. Instead, only run a\nsingle application process with a container.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "choice1 && choice2 && choice3 && choice4",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "choice1 && choice2",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "OPS",
+      "name": "Operational Excellence",
+      "questions": [
+        {
+          "id": "OPS_1",
+          "title": "Containerized applications have logging",
+          "description": "Description isn't a necessary property here for a question, but it might help your lens users.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Log to persisted files",
+              "helpfulResource": {
+                "displayText": "There are many diﬀerent ways to do logging. For some application frameworks, it's common to use an\napplication logging library that writes directly to disk ﬁles. It's also common to use one that streams\nlogs directly to an ELK (OpenSearch, Logstash, Kibana) stack or a similar logging setup. However, we\nrecommend that, when an application is containerized, you conﬁgure it to write application logs directly\nto the stdout and stderr streams.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Logs streamed directly to a 3rd party application",
+              "helpfulResource": {
+                "displayText": "There are many diﬀerent ways to do logging. For some application frameworks, it's common to use an\napplication logging library that writes directly to disk ﬁles. It's also common to use one that streams\nlogs directly to an ELK (OpenSearch, Logstash, Kibana) stack or a similar logging setup. However, we\nrecommend that, when an application is containerized, you conﬁgure it to write application logs directly\nto the stdout and stderr streams.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice3",
+              "title": "Logs streamed directly to stdout and stderr",
+              "helpfulResource": {
+                "displayText": "When you decouple log handling from your application code, it gives you greater ﬂexibility to adjust\nlog handling at the infrastructure level. Assume that you want to switch from one logging system to\nanother. You can do so by adjusting a few settings at the container orchestrator level, rather than having\nto change code in all your services, build a new container image, and deploy it.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice5",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "TChoose this if your workload does not follow any of the above options. ",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "choice3",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "choice1 && choice2",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        },
+        {
+          "id": "OPS_2",
+          "title": "Operations Excellence",
+          "description": "XXX.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Version container images using tags",
+              "helpfulResource": {
+                "displayText": "Container images are stored in a container registry. Each image in a registry is identiﬁed by a tag.\nThere's a tag called latest. This tag functions as a pointer to the latest version of the application\ncontainer image, similar to the HEAD in a git repository. We recommend that you use the latest tag\nonly for testing purposes. As a best practice, tag container images with a unique tag for each build. We\nrecommend that you tag your images using the git SHA for the git commit that was used to build the\nimage.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Maintain container versions in an image repository",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice3",
+              "title": "CI/CD tools used to build, test, and store to repository container images",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice4",
+              "title": "Container image caching option enabled for high catdinality images",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice5",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "TChoose this if your workload does not follow any of the above options. ",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "choice1 && choice2 && choice3",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "choice2",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        },
+        {
+          "id": "OPS_3",
+          "title": "Task Definition Configuration",
+          "description": "XXX.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "One business purpose per task definition",
+              "helpfulResource": {
+                "displayText": "Container images are stored in a container registry. Each image in a registry is identiﬁed by a tag.\nThere's a tag called latest. This tag functions as a pointer to the latest version of the application\ncontainer image, similar to the HEAD in a git repository. We recommend that you use the latest tag\nonly for testing purposes. As a best practice, tag container images with a unique tag for each build. We\nrecommend that you tag your images using the git SHA for the git commit that was used to build the\nimage.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "One container (excluding side cars) per task definition",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice3",
+              "title": "Maintain Task definition versions",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice4",
+              "title": "Match each application version with a task definition revision within a task definition family",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice5",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "TChoose this if your workload does not follow any of the above options. ",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "choice1 && choice2 && choice3 && choice4",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "choice1 && choice2",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        },
+        {
+          "id": "OPS_4",
+          "title": "Network mode selection",
+          "description": "XXX.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Use awsvpc network mode and give each service its own security group",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "XXX",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice5",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "TChoose this if your workload does not follow any of the above options. ",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "choice1 && choice2",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "choice1",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        },
+        {
+          "id": "OPS_5",
+          "title": "Service updates reduce risk of update failure",
+          "description": "XXX.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Rolling update has a minimum health percent defined",
+              "helpfulResource": {
+                "displayText": "When the rolling update (ECS) deployment type is used for your service, when a new service deployment is started the Amazon ECS service scheduler replaces the currently running tasks with new tasks. The number of tasks that Amazon ECS adds or removes from the service during a rolling update is controlled by the deployment configuration. The deployment configuration consists of the minimumHealthyPercent and maximumPercent values which are defined when the service is created, but can also be updated on an existing service.\n\nThe minimumHealthyPercent represents the lower limit on the number of tasks that should be running for a service during a deployment or when a container instance is draining, as a percent of the desired number of tasks for the service. This value is rounded up. For example if the minimum healthy percent is 50 and the desired task count is four, then the scheduler can stop two existing tasks before starting two new tasks. Likewise, if the minimum healthy percent is 75% and the desired task count is two, then the scheduler can't stop any tasks due to the resulting value also being two.\n\nThe maximumPercent represents the upper limit on the number of tasks that should be running for a service during a deployment or when a container instance is draining, as a percent of the desired number of tasks for a service. This value is rounded down. For example if the maximum percent is 200 and the desired task count is four then the scheduler can start four new tasks before stopping four existing tasks. Likewise, if the maximum percent is 125 and the desired task count is three, the scheduler can't start any tasks due to the resulting value also being three.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Deployment circuit breaker enabled when using the rolling update deployment type",
+              "helpfulResource": {
+                "displayText": "By default, when a service using the rolling update deployment type starts a new deployment, the service scheduler will launch new tasks until the desired count is reached. You can optionally use deployment circuit breaker logic on the service, which will cause the deployment to transition to a failed state if it can't reach a steady state. The deployment circuit breaker logic can also trigger Amazon ECS to roll back to the last completed deployment upon a deployment failure.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice3",
+              "title": "ECS Blue/Green deployment type enables service verification prior to sending it production traffic",
+              "helpfulResource": {
+                "displayText": "The blue/green deployment type uses the blue/green deployment model controlled by CodeDeploy. This deployment type enables you to verify a new deployment of a service before sending production traffic to it. For more information, see What Is CodeDeploy? in the AWS CodeDeploy User Guide.\n\nThere are three ways traﬃc can shift during a blue/green deployment:\n\n    Canary — Traﬃc is shifted in two increments. You can choose from predeﬁned canary options that specify the percentage of traﬃc shifted to your updated task set in the ﬁrst increment and the interval, in minutes, before the remaining traﬃc is shifted in the second increment.\n\n    Linear — Traﬃc is shifted in equal increments with an equal number of minutes between each increment. You can choose from predeﬁned linear options that specify the percentage of traﬃc shifted in each increment and the number of minutes between each increment.\n\n    All-at-once — All traﬃc is shifted from the original task set to the updated task set all at once.\n",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice5",
+              "title": "None of these",
+              "helpfulResource": {
+                "displayText": "TChoose this if your workload does not follow any of the above options. ",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "choice1 || choice2",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SECURITY",
+      "name": "Security",
+      "questions": [
+        {
+          "id": "SEC_1",
+          "title": "Task definition roles",
+          "description": "You can define different IAM roles for different Amazon ECS tasks.",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Use different IAM roles for each task definition family",
+              "helpfulResource": {
+                "displayText": "You can deﬁne diﬀerent IAM roles for diﬀerent tasks in Amazon ECS. Use the task deﬁnition to specify an\nIAM role for that application. When the containers in that task deﬁnition are run, they can call AWS APIs\nbased on the policies that are deﬁned in the IAM role. For more information, see IAM roles for tasks.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Task definition selected role must contain permissions to all services referenced by the task application",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice3",
+              "title": "ECS execution permissions limited to roles ",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice5",
+              "title": "None of the Above",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "choice1 && choice2",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "choice2",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        },
+        {
+          "id": "SEC_2",
+          "title": "No sensistive information placed in containers",
+          "description": "XXX",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Database and other passwords stored in AWS Secrets Manager",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice5",
+              "title": "None of the Above",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "choice1",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RELIABILITY",
+      "name": "Reliability",
+      "questions": [
+        {
+          "id": "REL_1",
+          "title": "Health checks validate a task instance is capable of performing work successfully",
+          "description": "XXX",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Test that confirm a server is listening on its expected port and accepting new TCP connections (Liveness checks)",
+              "helpfulResource": {
+                "displayText": "Liveness checks test the basic connectivity to a service and the presence of a server process. They are often performed by a load balancer or external monitoring agent, and they are unaware of the details about how an application works. Liveness checks tend to be included with the service and do not require an application author to implement anything. ",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Local health checks validate local resources and processes",
+              "helpfulResource": {
+                "displayText": "Local health checks go further than liveness checks to verify that the application is likely to be able to function. These health checks test resources that are not shared with the server’s peers. Therefore, they are unlikely to fail on many servers in the fleet simultaneously. ",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice3",
+              "title": "dependency health checks validate an application to interact with its adjacent systems",
+              "helpfulResource": {
+                "displayText": "Dependency health checks are a thorough inspection of the ability of an application to interact with its adjacent systems. These checks ideally catch problems local to the server, such as expired credentials, that are preventing it from interacting with a dependency. But they can also have false positives when there are problems with the dependency itself. Because of those false positives, we must be careful about how we react to dependency health check failures. ",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice4",
+              "title": "Anomaly detection validating if a server is behaving oddly compared to its peers",
+              "helpfulResource": {
+                "displayText": "Anomaly detection looks across all servers in a fleet to determine if any server is behaving oddly compared to its peers. By aggregating monitoring data per server, we can continuously compare error rates, latency data, or other attributes to find anomalous servers and automatically remove them from service. Anomaly detection can find divergence in the fleet that a server cannot detect about itself.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice5",
+              "title": "None of the Above",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "choice1 && choice2 && choice3 && choice4",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "choice1 && choice2",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "COST",
+      "name": "Cost Optimization",
+      "questions": [
+        {
+          "id": "COST_1",
+          "title": "ECS cost allocation",
+          "description": "XXX",
+          "choices": [
+            {
+              "id": "choice1",
+              "title": "Enable Amazon ECS managed tags and tag propogation",
+              "helpfulResource": {
+                "displayText": "After you enable Amazon ECS managed tags and tag propagation, Amazon ECS can attach\nand propagate tags on the tasks that the service launches. You can customize these tags and\nuse them to create tag dimensions such as environment=production or team=web or\napplication=storefront. These tags are used in usage and billing reports. If you set up the tags\ncorrectly, you can use them to see how many vCPU hours or GB hours that a particular environment,\nteam, or application used. This can help you to estimate the overall cost of your infrastructure along\ndiﬀerent dimensions.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice2",
+              "title": "Enabler cost allocation tags",
+              "helpfulResource": {
+                "displayText": "XXX",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            },
+            {
+              "id": "choice5",
+              "title": "One application process per container image",
+              "helpfulResource": {
+                "displayText": "In a traditional virtual machine environment, it's typical to run a high-level daemon like systemd as the\nroot process. This daemon is then responsible for starting your application process, and restarting the\napplication process if it crashes. We don't recommend this when using containers. Instead, only run a\nsingle application process with a container.",
+                "url": "https://aws.amazon.com"
+              },
+              "improvementPlan": {
+                "displayText": "You must have improvement plans per choice. It's optional whether or not to have a corresponding URL."
+              }
+            }
+          ],
+          "riskRules": [
+            {
+              "condition": "choice1 && choice2 ",
+              "risk": "NO_RISK"
+            },
+            {
+              "condition": "choice2",
+              "risk": "MEDIUM_RISK"
+            },
+            {
+              "condition": "default",
+              "risk": "HIGH_RISK"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
